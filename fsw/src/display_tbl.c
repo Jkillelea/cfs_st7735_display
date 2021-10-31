@@ -21,7 +21,7 @@
 */
 
 #include "cfe_tbl_filedef.h" /* Required to obtain the CFE_TBL_FILEDEF macro definition */
-#include "display_st7735s_table.h"
+#include "display_table.h"
 
 /*
 ** The following is an example of the declaration statement that defines the desired

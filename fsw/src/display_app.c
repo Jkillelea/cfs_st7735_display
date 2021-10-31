@@ -18,7 +18,7 @@
 **      See the License for the specific language governing permissions and
 **      limitations under the License.
 **
-** File: display_st7735s_app.c
+** File: display_app.c
 **
 ** Purpose:
 **   This file contains the source code for the Display App.
@@ -29,10 +29,10 @@
 ** Include Files:
 */
 #include "cfe_es.h"
-#include "display_st7735s_events.h"
-#include "display_st7735s_version.h"
-#include "display_st7735s.h"
-#include "display_st7735s_table.h"
+#include "display_events.h"
+#include "display_version.h"
+#include "display_app.h"
+#include "display_table.h"
 
 #include <string.h>
 

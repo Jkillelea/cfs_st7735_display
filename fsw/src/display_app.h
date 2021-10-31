@@ -38,10 +38,10 @@
 #include "cfe_sb.h"
 #include "cfe_es.h"
 
-#include "display_st7735s_perfids.h"
-#include "display_st7735s_msgids.h"
-#include "display_st7735s_msg.h"
-#include "display_st7735s_table.h"
+#include "display_perfids.h"
+#include "display_msgids.h"
+#include "display_msg.h"
+#include "display_table.h"
 
 /***********************************************************************/
 #define DISPLAY_PIPE_DEPTH 32 /* Depth of the Command Pipe for Application */

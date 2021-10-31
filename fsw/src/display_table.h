@@ -18,17 +18,17 @@
 **      See the License for the specific language governing permissions and
 **      limitations under the License.
 **
-** File: display_st7735s_table.h
+** File: display_table.h
 **
 ** Purpose:
-**  Define display_st7735s table
+**  Define display table
 **
 ** Notes:
 **
 **
 *******************************************************************************/
-#ifndef _display_st7735s_table_h_
-#define _display_st7735s_table_h_
+#ifndef _display_table_h_
+#define _display_table_h_
 
 #include "common_types.h"
 #include "trans_rs422.h"
@@ -43,7 +43,7 @@ typedef struct
     uint16     Int2;
 } DISPLAY_Table_t;
 
-#endif /* _display_st7735s_table_h_ */
+#endif /* _display_table_h_ */
 
 /************************/
 /*  End of File Comment */
