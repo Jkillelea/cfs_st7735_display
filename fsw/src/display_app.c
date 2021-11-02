@@ -221,6 +221,13 @@ int32 DISPLAY_Init(void)
         }
     }
 
+    /* Initialize the display device */
+    if (status == CFE_SUCCESS)
+    {
+        status = ST7735S_Init();
+        CFE_EVS_SendEvent(DISPLAY_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION, "ST7735S display initlaized\n");
+    }
+
     if (status == CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(DISPLAY_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION,
