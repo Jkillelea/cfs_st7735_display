@@ -29,12 +29,19 @@
 ** Include Files:
 */
 #include "cfe_es.h"
+#include "cfe_evs.h"
 #include "display_events.h"
 #include "display_version.h"
 #include "display_app.h"
 #include "display_table.h"
+#include "osapi-error.h"
+#include "osapi-file.h"
+#include "st7735s.h"
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /*
 ** global data
@@ -221,12 +228,42 @@ int32 DISPLAY_Init(void)
         }
     }
 
+    /* Use the tbl pointer to get spi port config */
+    DISPLAY_Table_t *displayTblPtr = NULL;
+    if (status == CFE_SUCCESS)
+    {
+        status = CFE_TBL_GetAddress((void **) &displayTblPtr, DISPLAY_Data.TblHandles[0]);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to get table pointer!");
+        }
+
+    }
+
     /* Initialize the display device */
     if (status == CFE_SUCCESS)
     {
-        status = ST7735S_Init();
-        CFE_EVS_SendEvent(DISPLAY_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION, "ST7735S display initlaized\n");
+        status = ST7735S_Init(&displayTblPtr->spiConfig);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to initialize display!");
+        }
+        else
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION, "ST7735S display initlaized");
+        }
     }
+
+    /* Release the table pointer */
+    if (displayTblPtr != NULL)
+    {
+        status = CFE_TBL_ReleaseAddress(DISPLAY_Data.TblHandles[0]);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to release tbl address!");
+        }
+    }
+
 
     if (status == CFE_SUCCESS)
     {
@@ -424,7 +461,9 @@ int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
         return status;
     }
 
-    CFE_ES_WriteToSysLog("Display: Table Value 1: %d  Value 2: %d", TblPtr->Int1, TblPtr->Int2);
+    CFE_ES_WriteToSysLog("Display: SPI path %s, mode %d speed %d bits/word %d",
+            TblPtr->spiConfig.device,   TblPtr->spiConfig.spiMode,
+            TblPtr->spiConfig.spiSpeed, TblPtr->spiConfig.bitsPerWord);
 
     DISPLAY_GetCrc(TableName);
 
@@ -434,9 +473,6 @@ int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
         CFE_ES_WriteToSysLog("Display: Fail to release table address: 0x%08lx", (unsigned long)status);
         return status;
     }
-
-    /* Invoke a function provided by DISPLAY_LIB */
-    // DISPLAY_LIB_Function();
 
     return CFE_SUCCESS;
 
@@ -466,8 +502,10 @@ bool DISPLAY_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t ExpectedLength)
 
         CFE_EVS_SendEvent(DISPLAY_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                           "Invalid Msg length: ID = 0x%X,  CC = %u, Len = %u, Expected = %u",
-                          (unsigned int)CFE_SB_MsgIdToValue(MsgId), (unsigned int)FcnCode, (unsigned int)ActualLength,
-                          (unsigned int)ExpectedLength);
+                          (unsigned int) CFE_SB_MsgIdToValue(MsgId),
+                          (unsigned int) FcnCode,
+                          (unsigned int) ActualLength,
+                          (unsigned int) ExpectedLength);
 
         result = false;
 
@@ -486,17 +524,24 @@ bool DISPLAY_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t ExpectedLength)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int32 DISPLAY_TblValidationFunc(void *TblData)
 {
-    int32               ReturnCode = CFE_SUCCESS;
+    int32 ReturnCode = 0;
 
-    // DISPLAY_Table_t *TblDataPtr = (DISPLAY_Table_t *)TblData;
+    struct stat filestats;
+    DISPLAY_Table_t *TblDataPtr = (DISPLAY_Table_t *)TblData;
+
     /*
     ** Display Table Validation
     */
-    // if (TblDataPtr->Int1 > DISPLAY_TBL_ELEMENT_1_MAX)
-    // {
-    //     /* First element is out of range, return an appropriate error code */
-    //     ReturnCode = DISPLAY_TABLE_OUT_OF_RANGE_ERR_CODE;
-    // }
+
+    // Does the file exist?
+    ReturnCode = stat(TblDataPtr->spiConfig.device, &filestats);
+    if (ReturnCode != 0)
+    {
+        CFE_EVS_SendEvent(DISPLAY_COMMAND_ERR_EID, CFE_EVS_EventType_ERROR,
+                "OS_stat failed for file %s (%d)!",
+                TblDataPtr->spiConfig.device, ReturnCode);
+        ReturnCode = -1;
+    }
 
     return ReturnCode;
 

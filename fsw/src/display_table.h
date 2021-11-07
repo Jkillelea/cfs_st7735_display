@@ -31,16 +31,14 @@
 #define _display_table_h_
 
 #include "common_types.h"
-#include "trans_rs422.h"
+#include "trans_spi.h"
 
 /*
 ** Table structure
 */
 typedef struct
 {
-    const char DevicePath[PORT_NAME_SIZE];
-    uint16     Int1;
-    uint16     Int2;
+    IO_TransSpiConfig_t spiConfig;
 } DISPLAY_Table_t;
 
 #endif /* _display_table_h_ */

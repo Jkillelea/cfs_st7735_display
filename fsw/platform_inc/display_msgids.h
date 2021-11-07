@@ -34,6 +34,7 @@
 /* V1 Command Message IDs must be 0x18xx */
 #define DISPLAY_CMD_MID     0x1882
 #define DISPLAY_SEND_HK_MID 0x1883
+
 /* V1 Telemetry Message IDs must be 0x08xx */
 #define DISPLAY_HK_TLM_MID 0x0883
 

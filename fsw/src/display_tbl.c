@@ -22,6 +22,7 @@
 
 #include "cfe_tbl_filedef.h" /* Required to obtain the CFE_TBL_FILEDEF macro definition */
 #include "display_table.h"
+#include <linux/spi/spidev.h>
 
 /*
 ** The following is an example of the declaration statement that defines the desired
@@ -29,9 +30,13 @@
 */
 DISPLAY_Table_t displayTable =
 {
-    "/dev/spidev0.0",
-    1,
-    2
+    .spiConfig =
+    {
+        .device = "/dev/spidev0.0",
+        .spiMode = SPI_MODE_3,
+        .spiSpeed = 1000000,
+        .bitsPerWord = 8,
+    }
 };
 
 /*

@@ -3,7 +3,7 @@
 
 #include "trans_spi.h"
 
-CFE_Status_t ST7735S_Init(void);
+CFE_Status_t ST7735S_Init(IO_TransSpiConfig_t *spiConfig);
 
 #endif // ST7735S_H_
 
