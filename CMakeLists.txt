@@ -4,7 +4,7 @@ include_directories(fsw/mission_inc)
 include_directories(fsw/platform_inc)
 
 # Create the app module
-add_cfe_app(display fsw/src/display_app.c fsw/src/st7735s.c)
+add_cfe_app(display fsw/src/display_app.c fsw/src/st7735s_driver.c)
 
 # depend on IO_LIB
 add_cfe_app_dependency(display io_lib)

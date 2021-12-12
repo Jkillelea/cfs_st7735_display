@@ -36,7 +36,7 @@
 #include "display_table.h"
 #include "osapi-error.h"
 #include "osapi-file.h"
-#include "st7735s.h"
+#include "st7735s_driver.h"
 
 #include <string.h>
 #include <sys/types.h>
@@ -243,7 +243,7 @@ int32 DISPLAY_Init(void)
     /* Initialize the display device */
     if (status == CFE_SUCCESS)
     {
-        status = ST7735S_Init(&displayTblPtr->spiConfig);
+        status = ST7735_Init(&displayTblPtr->spiConfig);
         if (status != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to initialize display!");
@@ -348,7 +348,7 @@ void DISPLAY_ProcessGroundCommand(CFE_SB_Buffer_t *SBBufPtr)
         case DISPLAY_PROCESS_CC:
             if (DISPLAY_VerifyCmdLength(&SBBufPtr->Msg, sizeof(DISPLAY_ProcessCmd_t)))
             {
-                DISPLAY_Process((DISPLAY_ProcessCmd_t *)SBBufPtr);
+                DISPLAY_ProcessTbl((DISPLAY_ProcessCmd_t *)SBBufPtr);
             }
 
             break;
@@ -445,7 +445,7 @@ int32 DISPLAY_ResetCounters(const DISPLAY_ResetCountersCmd_t *Msg)
 /*         This function Process Ground Station Command                       */
 /*                                                                            */
 /* * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * *  * *  * * * * */
-int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
+int32 DISPLAY_ProcessTbl(const DISPLAY_ProcessCmd_t *Msg)
 {
     int32               status;
     DISPLAY_Table_t *TblPtr;
