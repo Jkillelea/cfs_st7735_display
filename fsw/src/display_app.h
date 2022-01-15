@@ -109,7 +109,7 @@ void  DISPLAY_ProcessCommandPacket(CFE_SB_Buffer_t *SBBufPtr);
 void  DISPLAY_ProcessGroundCommand(CFE_SB_Buffer_t *SBBufPtr);
 int32 DISPLAY_ReportHousekeeping(const CFE_MSG_CommandHeader_t *Msg);
 int32 DISPLAY_ResetCounters(const DISPLAY_ResetCountersCmd_t *Msg);
-int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg);
+int32 DISPLAY_ProcessTbl(const DISPLAY_ProcessCmd_t *Msg);
 int32 DISPLAY_Noop(const DISPLAY_NoopCmd_t *Msg);
 void  DISPLAY_GetCrc(const char *TableName);
 

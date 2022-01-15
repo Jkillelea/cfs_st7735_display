@@ -31,13 +31,20 @@
 #include "cfe_error.h"
 #include "cfe_es.h"
 #include "cfe_tbl.h"
+#include "cfe_evs.h"
 #include "display_events.h"
 #include "display_fb.h"
 #include "display_version.h"
 #include "display_app.h"
 #include "display_table.h"
+#include "osapi-error.h"
+#include "osapi-file.h"
+#include "st7735s_driver.h"
 
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /*
 ** global data
@@ -224,6 +231,18 @@ int32 DISPLAY_Init(void)
         }
     }
 
+    /* Use the tbl pointer to get spi port config */
+    DISPLAY_Table_t *displayTblPtr = NULL;
+    if (status == CFE_SUCCESS)
+    {
+        status = CFE_TBL_GetAddress((void **) &displayTblPtr, DISPLAY_Data.TblHandles[0]);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to get table pointer!");
+        }
+
+    }
+
     /* Initialize the display device */
     if (status == CFE_SUCCESS)
     {
@@ -235,6 +254,17 @@ int32 DISPLAY_Init(void)
             CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Framebuffer display failed to initialize");
         }
     }
+
+    /* Release the table pointer */
+    if (displayTblPtr != NULL)
+    {
+        status = CFE_TBL_ReleaseAddress(DISPLAY_Data.TblHandles[0]);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Failed to release tbl address!");
+        }
+    }
+
 
     if (status == CFE_SUCCESS)
     {
@@ -319,7 +349,7 @@ void DISPLAY_ProcessGroundCommand(CFE_SB_Buffer_t *SBBufPtr)
         case DISPLAY_PROCESS_CC:
             if (DISPLAY_VerifyCmdLength(&SBBufPtr->Msg, sizeof(DISPLAY_ProcessCmd_t)))
             {
-                DISPLAY_Process((DISPLAY_ProcessCmd_t *)SBBufPtr);
+                DISPLAY_ProcessTbl((DISPLAY_ProcessCmd_t *)SBBufPtr);
             }
 
             break;
@@ -416,7 +446,7 @@ int32 DISPLAY_ResetCounters(const DISPLAY_ResetCountersCmd_t *Msg)
 /*         This function Process Ground Station Command                       */
 /*                                                                            */
 /* * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * *  * *  * * * * */
-int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
+int32 DISPLAY_ProcessTbl(const DISPLAY_ProcessCmd_t *Msg)
 {
     int32            status;
     DISPLAY_Table_t *TblPtr;
@@ -470,8 +500,10 @@ bool DISPLAY_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t ExpectedLength)
 
         CFE_EVS_SendEvent(DISPLAY_LEN_ERR_EID, CFE_EVS_EventType_ERROR,
                           "Invalid Msg length: ID = 0x%X,  CC = %u, Len = %u, Expected = %u",
-                          (unsigned int)CFE_SB_MsgIdToValue(MsgId), (unsigned int)FcnCode, (unsigned int)ActualLength,
-                          (unsigned int)ExpectedLength);
+                          (unsigned int) CFE_SB_MsgIdToValue(MsgId),
+                          (unsigned int) FcnCode,
+                          (unsigned int) ActualLength,
+                          (unsigned int) ExpectedLength);
 
         result = false;
 
@@ -490,17 +522,24 @@ bool DISPLAY_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t ExpectedLength)
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 int32 DISPLAY_TblValidationFunc(void *TblData)
 {
-    int32               ReturnCode = CFE_SUCCESS;
+    int32 ReturnCode = 0;
 
-    // DISPLAY_Table_t *TblDataPtr = (DISPLAY_Table_t *)TblData;
+    struct stat filestats;
+    DISPLAY_Table_t *TblDataPtr = (DISPLAY_Table_t *)TblData;
+
     /*
     ** Display Table Validation
     */
-    // if (TblDataPtr->Int1 > DISPLAY_TBL_ELEMENT_1_MAX)
-    // {
-    //     /* First element is out of range, return an appropriate error code */
-    //     ReturnCode = DISPLAY_TABLE_OUT_OF_RANGE_ERR_CODE;
-    // }
+
+    // Does the file exist?
+    ReturnCode = stat(TblDataPtr->DevicePath, &filestats);
+    if (ReturnCode != 0)
+    {
+        CFE_EVS_SendEvent(DISPLAY_COMMAND_ERR_EID, CFE_EVS_EventType_ERROR,
+                "OS_stat failed for file %s (%d)!",
+                TblDataPtr->DevicePath, ReturnCode);
+        ReturnCode = -1;
+    }
 
     return ReturnCode;
 
