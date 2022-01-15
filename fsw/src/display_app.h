@@ -42,6 +42,7 @@
 #include "display_msgids.h"
 #include "display_msg.h"
 #include "display_table.h"
+#include "display_events.h"
 
 /***********************************************************************/
 #define DISPLAY_PIPE_DEPTH 32 /* Depth of the Command Pipe for Application */

@@ -36,6 +36,13 @@
 #define DISPLAY_RESET_COUNTERS_CC 1
 #define DISPLAY_PROCESS_CC        2
 
+/*
+** DISPLAY App error codes
+*/
+#define DISPLAY_STATUS_ERROR_NULL ((CFE_Status_t) (CFE_SEVERITY_ERROR | CFE_GENERIC_SERVICE | 1))
+#define DISPLAY_STATUS_ERROR_OPEN ((CFE_Status_t) (CFE_SEVERITY_ERROR | CFE_GENERIC_SERVICE | 2))
+#define DISPLAY_STATUS_ERROR_READ ((CFE_Status_t) (CFE_SEVERITY_ERROR | CFE_GENERIC_SERVICE | 3))
+
 /*************************************************************************/
 
 /*

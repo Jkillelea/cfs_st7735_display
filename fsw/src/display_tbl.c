@@ -29,9 +29,7 @@
 */
 DISPLAY_Table_t displayTable =
 {
-    "/dev/spidev0.0",
-    1,
-    2
+    "/dev/fb1",
 };
 
 /*

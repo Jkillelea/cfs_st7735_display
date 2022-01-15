@@ -28,8 +28,11 @@
 /*
 ** Include Files:
 */
+#include "cfe_error.h"
 #include "cfe_es.h"
+#include "cfe_tbl.h"
 #include "display_events.h"
+#include "display_fb.h"
 #include "display_version.h"
 #include "display_app.h"
 #include "display_table.h"
@@ -224,8 +227,13 @@ int32 DISPLAY_Init(void)
     /* Initialize the display device */
     if (status == CFE_SUCCESS)
     {
-        status = ST7735S_Init();
-        CFE_EVS_SendEvent(DISPLAY_STARTUP_INF_EID, CFE_EVS_EventType_INFORMATION, "ST7735S display initlaized\n");
+        DISPLAY_Table_t *tblPtr;
+        CFE_TBL_GetAddress((void **) &tblPtr, DISPLAY_Data.TblHandles[0]);
+        status = DISPLAY_FbInit(tblPtr);
+        if (status != CFE_SUCCESS)
+        {
+            CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR, "Framebuffer display failed to initialize");
+        }
     }
 
     if (status == CFE_SUCCESS)
@@ -410,12 +418,11 @@ int32 DISPLAY_ResetCounters(const DISPLAY_ResetCountersCmd_t *Msg)
 /* * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * *  * *  * * * * */
 int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
 {
-    int32               status;
+    int32            status;
     DISPLAY_Table_t *TblPtr;
-    const char *        TableName = "DISPLAY.displayTable";
+    const char      *TableName = "DISPLAY.displayTable";
 
     /* Use of Table */
-
     status = CFE_TBL_GetAddress((void *)&TblPtr, DISPLAY_Data.TblHandles[0]);
 
     if (status < CFE_SUCCESS)
@@ -424,7 +431,7 @@ int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
         return status;
     }
 
-    CFE_ES_WriteToSysLog("Display: Table Value 1: %d  Value 2: %d", TblPtr->Int1, TblPtr->Int2);
+    CFE_ES_WriteToSysLog("Display: Table Device Path %s", TblPtr->DevicePath);
 
     DISPLAY_GetCrc(TableName);
 
@@ -434,9 +441,6 @@ int32 DISPLAY_Process(const DISPLAY_ProcessCmd_t *Msg)
         CFE_ES_WriteToSysLog("Display: Fail to release table address: 0x%08lx", (unsigned long)status);
         return status;
     }
-
-    /* Invoke a function provided by DISPLAY_LIB */
-    // DISPLAY_LIB_Function();
 
     return CFE_SUCCESS;
 
