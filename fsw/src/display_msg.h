@@ -29,6 +29,9 @@
 #ifndef DISPLAY_MSG_H
 #define DISPLAY_MSG_H
 
+#include "common_types.h"
+#include "cfe_msg.h"
+
 /*
 ** DISPLAY App command codes
 */

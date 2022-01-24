@@ -28,20 +28,15 @@
 /*
 ** Include Files:
 */
-#include "cfe_error.h"
 #include "cfe_es.h"
 #include "cfe_tbl.h"
 #include "cfe_evs.h"
+#include "display_app.h"
 #include "display_events.h"
 #include "display_fb.h"
 #include "display_version.h"
-#include "display_app.h"
 #include "display_table.h"
-#include "osapi-error.h"
-#include "osapi-file.h"
-#include "st7735s_driver.h"
 
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -523,22 +518,22 @@ bool DISPLAY_VerifyCmdLength(CFE_MSG_Message_t *MsgPtr, size_t ExpectedLength)
 int32 DISPLAY_TblValidationFunc(void *TblData)
 {
     int32 ReturnCode = 0;
-
     struct stat filestats;
+    
+
     DISPLAY_Table_t *TblDataPtr = (DISPLAY_Table_t *)TblData;
 
     /*
     ** Display Table Validation
     */
 
-    // Does the file exist?
+    /* Does the file exist? */
     ReturnCode = stat(TblDataPtr->DevicePath, &filestats);
     if (ReturnCode != 0)
     {
         CFE_EVS_SendEvent(DISPLAY_COMMAND_ERR_EID, CFE_EVS_EventType_ERROR,
-                "OS_stat failed for file %s (%d)!",
-                TblDataPtr->DevicePath, ReturnCode);
-        ReturnCode = -1;
+                "stat failed for file %s (%d)!", TblDataPtr->DevicePath, ReturnCode);
+        ReturnCode = DISPLAY_TBL_ERR_EID;
     }
 
     return ReturnCode;

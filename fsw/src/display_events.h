@@ -38,6 +38,7 @@
 #define DISPLAY_INVALID_MSGID_ERR_EID 6
 #define DISPLAY_LEN_ERR_EID           7
 #define DISPLAY_PIPE_ERR_EID          8
+#define DISPLAY_TBL_ERR_EID           9
 
 #define DISPLAY_EVENT_COUNTS 9
 

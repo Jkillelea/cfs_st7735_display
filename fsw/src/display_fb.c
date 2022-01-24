@@ -10,8 +10,8 @@
 #include <string.h>
 #include <unistd.h>
 
-static uint8 *FBPtr = NULL;
-static int   FBFd   = -1;
+static uint8                   *FBPtr = NULL;
+static int                      FBFd  = -1;
 static struct fb_var_screeninfo VInfo = {0};
 static struct fb_fix_screeninfo FInfo = {0};
 
