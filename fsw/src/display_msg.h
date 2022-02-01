@@ -38,6 +38,7 @@
 #define DISPLAY_NOOP_CC           0
 #define DISPLAY_RESET_COUNTERS_CC 1
 #define DISPLAY_PROCESS_CC        2
+#define DISPLAY_FILLRECT_CC       3
 
 /*
 ** DISPLAY App error codes
@@ -66,6 +67,25 @@ typedef struct
 typedef DISPLAY_NoArgsCmd_t DISPLAY_NoopCmd_t;
 typedef DISPLAY_NoArgsCmd_t DISPLAY_ResetCountersCmd_t;
 typedef DISPLAY_NoArgsCmd_t DISPLAY_ProcessCmd_t;
+
+typedef struct
+{
+    uint8 red;
+    uint8 green;
+    uint8 blue;
+    uint8 alpha;
+} DISPLAY_Color_t;
+
+typedef struct
+{
+    CFE_MSG_CommandHeader_t CmdHeader; /**< \brief Command header */
+    DISPLAY_Color_t color;
+    uint32          startX;
+    uint32          startY;
+    uint32          sizeX;
+    uint32          sizeY;
+} DISPLAY_FillRectCmd_t;
+
 
 /*************************************************************************/
 /*

@@ -1,4 +1,4 @@
-project(CFE_SAMPLE_APP C)
+project(DISPLAY_APP C)
 
 include_directories(fsw/mission_inc)
 include_directories(fsw/platform_inc)

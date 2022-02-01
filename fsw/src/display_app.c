@@ -1,27 +1,11 @@
 /*******************************************************************************
 **
-**      GSC-18128-1, "Core Flight Executive Version 6.7"
-**
-**      Copyright (c) 2006-2019 United States Government as represented by
-**      the Administrator of the National Aeronautics and Space Administration.
-**      All Rights Reserved.
-**
-**      Licensed under the Apache License, Version 2.0 (the "License");
-**      you may not use this file except in compliance with the License.
-**      You may obtain a copy of the License at
-**
-**        http://www.apache.org/licenses/LICENSE-2.0
-**
-**      Unless required by applicable law or agreed to in writing, software
-**      distributed under the License is distributed on an "AS IS" BASIS,
-**      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-**      See the License for the specific language governing permissions and
-**      limitations under the License.
-**
 ** File: display_app.c
 **
 ** Purpose:
 **   This file contains the source code for the Display App.
+**
+** Author: Jacob Killelea
 **
 *******************************************************************************/
 
@@ -349,6 +333,14 @@ void DISPLAY_ProcessGroundCommand(CFE_SB_Buffer_t *SBBufPtr)
 
             break;
 
+        case DISPLAY_FILLRECT_CC:
+            if (DISPLAY_VerifyCmdLength(&SBBufPtr->Msg, sizeof(DISPLAY_FillRectCmd_t)))
+            {
+                DISPLAY_FillRect((DISPLAY_FillRectCmd_t *) SBBufPtr);
+            }
+
+            break;
+
         /* default case already found during FC vs length test */
         default:
             CFE_EVS_SendEvent(DISPLAY_COMMAND_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -464,12 +456,28 @@ int32 DISPLAY_ProcessTbl(const DISPLAY_ProcessCmd_t *Msg)
     if (status != CFE_SUCCESS)
     {
         CFE_ES_WriteToSysLog("Display: Fail to release table address: 0x%08lx", (unsigned long)status);
-        return status;
     }
 
-    return CFE_SUCCESS;
+    return status;
 
-} /* End of DISPLAY_ProcessCC */
+} /* End of DISPLAY_ProcessTbl */
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+/*  Name:  DISPLAY_FillRect                                                     */
+/*                                                                            */
+/*  Purpose:                                                                  */
+/*         This function Process Ground Station Command                       */
+/*                                                                            */
+/* * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * *  * *  * * * * */
+int32 DISPLAY_FillRect(const DISPLAY_FillRectCmd_t *Msg)
+{
+    int32 status = CFE_SUCCESS;
+
+    // TODO
+
+    return status;
+
+} /* End of DISPLAY_ProcessTbl */
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 /*                                                                            */
