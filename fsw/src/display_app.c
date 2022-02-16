@@ -151,7 +151,7 @@ int32 DISPLAY_Init(void)
     /*
     ** Initialize housekeeping packet (clear user data area).
     */
-    CFE_MSG_Init(&DISPLAY_Data.HkTlm.TlmHeader.Msg, DISPLAY_HK_TLM_MID, sizeof(DISPLAY_Data.HkTlm));
+    CFE_MSG_Init(&DISPLAY_Data.HkTlm.TlmHeader.Msg, CFE_SB_ValueToMsgId(DISPLAY_HK_TLM_MID), sizeof(DISPLAY_Data.HkTlm));
 
     /*
     ** Create Software Bus message pipe.
@@ -167,7 +167,7 @@ int32 DISPLAY_Init(void)
     /*
     ** Subscribe to Housekeeping request commands
     */
-    status = CFE_SB_Subscribe(DISPLAY_SEND_HK_MID, DISPLAY_Data.CommandPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(DISPLAY_SEND_HK_MID), DISPLAY_Data.CommandPipe);
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -178,7 +178,7 @@ int32 DISPLAY_Init(void)
     /*
     ** Subscribe to ground command packets
     */
-    status = CFE_SB_Subscribe(DISPLAY_CMD_MID, DISPLAY_Data.CommandPipe);
+    status = CFE_SB_Subscribe(CFE_SB_ValueToMsgId(DISPLAY_CMD_MID), DISPLAY_Data.CommandPipe);
     if (status != CFE_SUCCESS)
     {
         CFE_EVS_SendEvent(DISPLAY_STARTUP_ERR_EID, CFE_EVS_EventType_ERROR,
@@ -273,7 +273,7 @@ void DISPLAY_ProcessCommandPacket(CFE_SB_Buffer_t *SBBufPtr)
 
     CFE_MSG_GetMsgId(&SBBufPtr->Msg, &MsgId);
 
-    switch (MsgId)
+    switch (CFE_SB_MsgIdToValue(MsgId))
     {
         case DISPLAY_CMD_MID:
             DISPLAY_ProcessGroundCommand(SBBufPtr);
